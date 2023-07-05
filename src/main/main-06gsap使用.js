@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 //导入轨道控制器
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+//导入动画库
+import gsap from 'gsap';
 
 // console.log(THREE);
 
@@ -22,12 +24,10 @@ const cubeMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
 const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
 //修改物体位置
 // cube.position.set(5,0,0);
-cube.position.x = 3;
 // 设置缩放
 // cube.scale.set(3,2,1);
-cube.scale.x = 3;
 // 旋转
-cube.rotation.set(Math.PI / 4, 0, 0, 'ZYX');
+// cube.rotation.set(Math.PI / 4, 0, 0, 'ZYX');
 //将几何体添加到场景中
 scene.add(cube);
 
@@ -45,37 +45,43 @@ document.body.appendChild(renderer.domElement);
 
 //7、创建轨道控制器
 const controls = new OrbitControls(camera, renderer.domElement);
-//设置控制器阻尼，让控制器效果更真实，必须在动画循环里面调用。update()
-controls.enableDamping = true;
-
+//创建时钟
+const clock = new THREE.Clock();
 //8、多次渲染
 function render() {
-  // cube.position.x += 0.1;
-  // if(cube.position.x > 5) {
-  //     cube.position.x = 0;
-  // }
+  var aminal = gsap.to(cube.position, {
+    x: 5, duration: 5, ease: "power1.out",
+    repeat: -1,
+    yoyo: true,
+    // delay: 2,
+    onComplete: () => {
+      console.log('加进去了');
+    },
+    onStart: () => {
+      console.log('动画开始');
+    }
 
-  cube.rotation.x += 0.1;
-  if (cube.rotation.x > 3.14) {
-    cube.rotation.x = 0;
-  }
+  })
+  window.addEventListener('dblclick', function () {
+    if (aminal.isActive()) {
+      aminal.pause();
+    } else {
+      aminal.resume();
+    }
+  
+    }
+  )
+  // gsap.to(cube.rotation, { x: 2 * Math.PI, duration: 5, ease: "power1.out" })
+  // gsap.to(cube.scale, { x:3, y:2, duration: 5 })
+  //获取时间
+  const t = clock.getElapsedTime();
+
   renderer.render(scene, camera);
-  controls.update();
-  //浏览器帧改变函数会被调用
+  //浏览器帧改变函数会被调用,默认传递time
   requestAnimationFrame(render);
 }
 render();
-//使屏幕改变后自适应
-window.addEventListener('resize', () => {
-  //画面变化更新摄像头
-  camera.aspect = window.innerWidth / window.innerHeight;
-  //更新摄像机投影矩阵
-  camera.updateProjectionMatrix();
-  //更新渲染器
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  //设置渲染器像素比
-  renderer.setPixelRatio(window.devicePixelRatio);
-});
+
 
 //9、添加坐标轴辅助器
 const axesHelper = new THREE.AxesHelper(5);

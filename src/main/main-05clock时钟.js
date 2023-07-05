@@ -45,37 +45,34 @@ document.body.appendChild(renderer.domElement);
 
 //7、创建轨道控制器
 const controls = new OrbitControls(camera, renderer.domElement);
-//设置控制器阻尼，让控制器效果更真实，必须在动画循环里面调用。update()
-controls.enableDamping = true;
-
+//创建时钟
+const clock = new THREE.Clock();
 //8、多次渲染
 function render() {
+  //获取运行总时长
+  // let time  = clock.getElapsedTime();
+  let deltaTime = clock.getDelta();
+  // console.log(time);
+  console.log(deltaTime);
   // cube.position.x += 0.1;
   // if(cube.position.x > 5) {
   //     cube.position.x = 0;
   // }
-
+  // let t = (time / 1000) % 5;
+  // console.log(t);
+  // cube.position.x = t * 1;
+  // if (cube.position.x > 5) {
+  //   cube.position.x = 0;
+  // }
   cube.rotation.x += 0.1;
   if (cube.rotation.x > 3.14) {
     cube.rotation.x = 0;
   }
   renderer.render(scene, camera);
-  controls.update();
-  //浏览器帧改变函数会被调用
+  //浏览器帧改变函数会被调用,默认传递time
   requestAnimationFrame(render);
 }
 render();
-//使屏幕改变后自适应
-window.addEventListener('resize', () => {
-  //画面变化更新摄像头
-  camera.aspect = window.innerWidth / window.innerHeight;
-  //更新摄像机投影矩阵
-  camera.updateProjectionMatrix();
-  //更新渲染器
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  //设置渲染器像素比
-  renderer.setPixelRatio(window.devicePixelRatio);
-});
 
 //9、添加坐标轴辅助器
 const axesHelper = new THREE.AxesHelper(5);
